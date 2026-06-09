@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Last Light Protocol</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- MAIN MENU -->
+  <div id="main-menu" class="screen active">
+    <div class="menu-bg"></div>
+    <div class="menu-content">
+      <div class="game-logo">
+        <div class="logo-top">LAST LIGHT</div>
+        <div class="logo-sub">P R O T O C O L</div>
+        <div class="logo-tagline">THE DEAD DON'T SLEEP</div>
+      </div>
+      <div class="menu-buttons">
+        <button id="btn-campaign" class="menu-btn primary">&#9654; CAMPAIGN</button>
+        <button id="btn-multiplayer" class="menu-btn">&#9651; MULTIPLAYER</button>
+        <button id="btn-settings" class="menu-btn">&#9650; SETTINGS</button>
+      </div>
+    </div>
+    <div class="version">v1.0.0 &mdash; Last Light Protocol</div>
+  </div>
+
+  <!-- USERNAME SCREEN -->
+  <div id="username-screen" class="screen">
+    <div class="modal-box">
+      <h2>IDENTIFY YOURSELF, SURVIVOR</h2>
+      <input type="text" id="username-input" maxlength="16" placeholder="Enter callsign..." autocomplete="off" />
+      <button id="btn-confirm-username" class="menu-btn primary">CONFIRM</button>
+      <button id="btn-back-username" class="menu-btn">BACK</button>
+    </div>
+  </div>
+
+  <!-- MULTIPLAYER LOBBY -->
+  <div id="multiplayer-lobby" class="screen">
+    <div class="modal-box">
+      <h2>MULTIPLAYER</h2>
+      <p class="modal-sub">Up to 4 survivors. Stay together or die alone.</p>
+      <button id="btn-create-room" class="menu-btn primary">CREATE ROOM</button>
+      <div class="divider"><span>OR</span></div>
+      <input type="text" id="room-code-input" maxlength="6" placeholder="ENTER ROOM CODE" autocomplete="off" style="text-transform:uppercase" />
+      <button id="btn-join-room" class="menu-btn">JOIN ROOM</button>
+      <div id="lobby-error" class="error-msg"></div>
+      <button id="btn-back-lobby" class="menu-btn back-btn">&#8592; BACK</button>
+    </div>
+  </div>
+
+  <!-- ROOM WAITING -->
+  <div id="room-screen" class="screen">
+    <div class="modal-box">
+      <h2>WAITING FOR SURVIVORS</h2>
+      <div class="room-code-box">ROOM CODE: <span id="room-code-display" class="room-code"></span></div>
+      <div id="player-list" class="player-list"></div>
+      <div class="room-hint">Share the room code with up to 3 friends</div>
+      <button id="btn-start-game" class="menu-btn primary" style="display:none">START GAME</button>
+      <button id="btn-leave-room" class="menu-btn">LEAVE ROOM</button>
+    </div>
+  </div>
+
+  <!-- MISSION SELECT -->
+  <div id="mission-select" class="screen">
+    <div class="mission-select-content">
+      <h2>SELECT MISSION</h2>
+      <div id="mission-list" class="mission-list"></div>
+      <button id="btn-back-mission" class="menu-btn back-btn">&#8592; BACK</button>
+    </div>
+  </div>
+
+  <!-- GAME CANVAS -->
+  <canvas id="game-canvas"></canvas>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div id="hud-top">
+      <div id="mission-tracker">
+        <div id="mission-name">MISSION</div>
+        <div id="mission-objective">Objective</div>
+      </div>
+      <div id="minimap-container">
+        <canvas id="minimap" width="128" height="128"></canvas>
+        <div id="minimap-label">MAP</div>
+      </div>
+    </div>
+
+    <div id="hud-bottom">
+      <div id="hud-left">
+        <div id="health-container" class="stat-bar-group">
+          <div class="bar-label">HP</div>
+          <div class="bar-bg"><div id="health-bar" class="bar health"></div></div>
+          <span id="health-value">100</span>
+        </div>
+        <div id="armor-container" class="stat-bar-group">
+          <div class="bar-label">AR</div>
+          <div class="bar-bg"><div id="armor-bar" class="bar armor"></div></div>
+          <span id="armor-value">0</span>
+        </div>
+        <div id="stamina-container" class="stat-bar-group">
+          <div class="bar-label">ST</div>
+          <div class="bar-bg"><div id="stamina-bar" class="bar stamina"></div></div>
+        </div>
+      </div>
+
+      <div id="hud-center">
+        <div id="crosshair"><span class="ch-top"></span><span class="ch-right"></span><span class="ch-bottom"></span><span class="ch-left"></span><span class="ch-dot"></span></div>
+        <div id="hit-marker" class="hidden">&#10005;</div>
+        <div id="interact-prompt" class="hidden">[E] Interact</div>
+      </div>
+
+      <div id="hud-right">
+        <div id="weapon-display">
+          <div id="weapon-name">PISTOL</div>
+          <div id="ammo-display">
+            <span id="ammo-current">12</span><span class="ammo-sep">/</span><span id="ammo-reserve">48</span>
+          </div>
+          <div id="reload-indicator" class="hidden">RELOADING...</div>
+        </div>
+        <div id="grenade-display">&#128163; <span id="grenade-num">2</span></div>
+        <div id="weapon-slots">
+          <div class="wslot" id="ws-0">1</div>
+          <div class="wslot" id="ws-1">2</div>
+          <div class="wslot" id="ws-2">3</div>
+          <div class="wslot" id="ws-3">4</div>
+          <div class="wslot" id="ws-4">5</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="hud-notifications">
+      <div id="checkpoint-notification" class="notification checkpoint hidden">&#10003; CHECKPOINT SAVED</div>
+      <div id="pickup-notification" class="notification pickup hidden"></div>
+      <div id="kill-notification" class="notification kill hidden"></div>
+    </div>
+
+    <div id="multiplayer-scoreboard" class="hidden">
+      <h3>SURVIVORS</h3>
+      <div id="scoreboard-list"></div>
+    </div>
+
+    <div id="wave-indicator" class="hidden">
+      <div id="wave-text">WAVE 1</div>
+      <div id="wave-enemies">Enemies: <span id="wave-count">0</span></div>
+    </div>
+  </div>
+
+  <!-- DAMAGE OVERLAY -->
+  <div id="damage-overlay"></div>
+
+  <!-- INVENTORY -->
+  <div id="inventory-screen" class="hidden overlay-panel">
+    <div class="inventory-box">
+      <h3>INVENTORY</h3>
+      <div id="inventory-grid" class="inventory-grid"></div>
+      <div id="inventory-hint">[I] or [TAB] to close</div>
+    </div>
+  </div>
+
+  <!-- DIALOGUE -->
+  <div id="dialogue-box" class="hidden">
+    <div id="dialogue-portrait-area">
+      <div id="dialogue-portrait"></div>
+    </div>
+    <div id="dialogue-text-area">
+      <div id="dialogue-speaker"></div>
+      <div id="dialogue-text"></div>
+    </div>
+    <div id="dialogue-continue">[E] CONTINUE</div>
+  </div>
+
+  <!-- CUTSCENE -->
+  <div id="cutscene-overlay" class="hidden">
+    <div id="cutscene-bars-top"></div>
+    <div id="cutscene-text"></div>
+    <div id="cutscene-bars-bottom"></div>
+  </div>
+
+  <!-- PAUSE MENU -->
+  <div id="pause-menu" class="hidden overlay-panel">
+    <div class="modal-box">
+      <h2>PAUSED</h2>
+      <button id="btn-resume" class="menu-btn primary">RESUME [ESC]</button>
+      <button id="btn-restart" class="menu-btn">RESTART MISSION</button>
+      <button id="btn-main-menu-pause" class="menu-btn">MAIN MENU</button>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="settings-screen" class="screen">
+    <div class="modal-box">
+      <h2>SETTINGS</h2>
+      <div class="setting-row">
+        <label>Mouse Sensitivity</label>
+        <input type="range" id="setting-sensitivity" min="1" max="10" value="5" />
+        <span id="sensitivity-val">5</span>
+      </div>
+      <div class="setting-row">
+        <label>Master Volume</label>
+        <input type="range" id="setting-volume" min="0" max="10" value="7" />
+        <span id="volume-val">7</span>
+      </div>
+      <div class="setting-row">
+        <label>FOV</label>
+        <input type="range" id="setting-fov" min="60" max="110" value="75" />
+        <span id="fov-val">75</span>
+      </div>
+      <button id="btn-back-settings" class="menu-btn primary">BACK</button>
+    </div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div id="game-over-screen" class="hidden overlay-panel">
+    <div class="modal-box">
+      <h2 id="game-over-title">YOU DIED</h2>
+      <p id="game-over-message">The dead claimed another soul.</p>
+      <button id="btn-respawn" class="menu-btn primary">RESPAWN AT CHECKPOINT</button>
+      <button id="btn-go-menu" class="menu-btn">MAIN MENU</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loading-screen" class="hidden">
+    <div class="loading-content">
+      <div id="loading-title">LAST LIGHT PROTOCOL</div>
+      <div id="loading-mission-name"></div>
+      <div class="loading-bar-bg"><div id="loading-bar"></div></div>
+      <div id="loading-tip"></div>
+    </div>
+  </div>
+
+  <!-- MOBILE CONTROLS -->
+  <div id="mobile-controls" class="hidden">
+    <div id="joystick-left" class="joystick-zone">
+      <div id="joystick-left-knob" class="joystick-knob"></div>
+    </div>
+    <div id="joystick-right" class="joystick-zone right-zone">
+      <div id="joystick-right-knob" class="joystick-knob"></div>
+    </div>
+    <button id="mobile-shoot" class="mobile-btn shoot-btn">&#9679;</button>
+    <button id="mobile-reload" class="mobile-btn reload-btn">R</button>
+    <button id="mobile-jump" class="mobile-btn jump-btn">&#8593;</button>
+    <button id="mobile-grenade" class="mobile-btn grenade-btn">&#128163;</button>
+  </div>
+
+  <!-- Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Socket.IO client (graceful fallback if no server) -->
+  <script>
+    // Attempt to load socket.io; silently ignore if not available
+    window._socketIOLoaded = false;
+  </script>
+  <script src="/socket.io/socket.io.js" onload="window._socketIOLoaded=true;" onerror="console.warn('Socket.IO not available - multiplayer disabled')"></script>
+
+  <!-- Game Scripts (load order matters) -->
+  <script src="js/utils/helpers.js"></script>
+  <script src="js/engine/audio.js"></script>
+  <script src="js/player/inventory.js"></script>
+  <script src="js/weapons/weapons.js"></script>
+  <script src="js/weapons/weaponSystem.js"></script>
+  <script src="js/zombies/zombieTypes.js"></script>
+  <script src="js/zombies/zombieManager.js"></script>
+  <script src="js/world/maps.js"></script>
+  <script src="js/world/mapManager.js"></script>
+  <script src="js/loot/lootSystem.js"></script>
+  <script src="js/story/dialogue.js"></script>
+  <script src="js/story/missions.js"></script>
+  <script src="js/story/missionSystem.js"></script>
+  <script src="js/player/controls.js"></script>
+  <script src="js/player/player.js"></script>
+  <script src="js/engine/physics.js"></script>
+  <script src="js/engine/renderer.js"></script>
+  <script src="js/ui/hud.js"></script>
+  <script src="js/ui/menu.js"></script>
+  <script src="js/multiplayer/networkManager.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
